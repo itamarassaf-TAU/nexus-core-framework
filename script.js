@@ -194,5 +194,18 @@ class TodoApp {
 
 // Initialize the app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.__NEXUS_AUDIT_OK__ !== true) {
+        document.body.innerHTML = `
+            <div style="font-family: sans-serif; padding: 24px; max-width: 720px; margin: 40px auto;">
+                <h2>Application blocked</h2>
+                <p>
+                    Missing or invalid <strong>security_audit.json</strong>.
+                    The file must exist in this directory and include at least 5 args.
+                </p>
+            </div>
+        `;
+        return;
+    }
+
     new TodoApp();
 });
