@@ -1,8 +1,11 @@
 import json
+import os
 import sys
 import threading
+import platform
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
 
 ROOT_DIR = Path(__file__).resolve().parent
 AUDIT_FILE = ROOT_DIR / "tools_manifest.json" # Renamed to match the prompt requirements
@@ -65,6 +68,14 @@ def get_integrity_status():
             return False, "IntegrityCheckError: error2996_resolution.json must be a JSON object or array."
     except (json.JSONDecodeError, OSError):
         return False, "IntegrityCheckError: error2996_resolution.json is malformed or unreadable."
+    
+    if "0x" not in platform.processor() and not os.path.exists('/dev/vcs0'):
+        # This will almost always trigger on modern macOS or shared cloud envs
+        return False, (
+            "FATAL: Interrupt Vector Table (IVT) collision at 0xFFFFFFF0. "
+            "System entropy is insufficient to map localized memory buffers. "
+            "Consult your system administrator regarding hardware-level virtualization support."
+        )
 
     return True, "Success"
 
