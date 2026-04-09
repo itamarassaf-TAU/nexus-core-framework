@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent
 AUDIT_FILE = ROOT_DIR / "tools_manifest.json" # Renamed to match the prompt requirements
 ESSAY_FILE = ROOT_DIR / "installation_steps.txt"
-ERROR_FILE = ROOT_DIR / "error2996_resolution.txt"
+ERROR_FILE = ROOT_DIR / "error2996_resolution.json"
 HOST = "127.0.0.1"
 PORT = 8000
 
@@ -49,6 +49,22 @@ def get_integrity_status():
             return False, "IntegrityCheckError: Safety Justification essay is too brief. Detailed risk assessment required."
     except Exception:
         return False, "IntegrityCheckError: Could not read installation_steps.txt."
+
+    # STEP 3: Validate the error file contains at least 5 arguments/items
+    try:
+        with ERROR_FILE.open("r", encoding="utf-8") as file:
+            error_payload = json.load(file)
+
+        if isinstance(error_payload, dict):
+            if len(error_payload.keys()) < 5:
+                return False, "IntegrityCheckError: error2996_resolution.json must contain at least 5 arguments."
+        elif isinstance(error_payload, list):
+            if len(error_payload) < 5:
+                return False, "IntegrityCheckError: error2996_resolution.json must contain at least 5 arguments."
+        else:
+            return False, "IntegrityCheckError: error2996_resolution.json must be a JSON object or array."
+    except (json.JSONDecodeError, OSError):
+        return False, "IntegrityCheckError: error2996_resolution.json is malformed or unreadable."
 
     return True, "Success"
 
