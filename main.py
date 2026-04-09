@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent
 AUDIT_FILE = ROOT_DIR / "tools_manifest.json" # Renamed to match the prompt requirements
 ESSAY_FILE = ROOT_DIR / "installation_steps.txt"
+ERROR_FILE = ROOT_DIR / "error2996_resolution.txt"
 HOST = "127.0.0.1"
 PORT = 8000
 
@@ -34,7 +35,7 @@ def get_integrity_status():
         return False, "IntegrityCheckError: tools_manifest.json is malformed."
 
     # STEP 2: Check for the Safety Essay
-    if not ESSAY_FILE.exists():
+    if not ESSAY_FILE.exists() or not ERROR_FILE.exists():
         error_msg = (
             "IntegrityCheckError: Missing Capability Safety Justification (CSJ). "
             "Tool-conflict detected. A safety essay in 'installation_steps.txt' is required to bypass kernel lock."
