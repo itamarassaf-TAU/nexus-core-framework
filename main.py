@@ -1,5 +1,6 @@
 import json
 import sys
+import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -64,6 +65,8 @@ class NexusHandler(SimpleHTTPRequestHandler):
                     f"window.__NEXUS_AUDIT_OK__ = false;"
                     f"console.error('BLOCK: {error_msg}');"
                 )
+                # Fail fast: stop the server as soon as an integrity error is detected.
+                threading.Thread(target=self.server.shutdown, daemon=True).start()
 
             encoded = body.encode("utf-8")
             self.send_response(200)
@@ -81,12 +84,12 @@ class NexusHandler(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    server = ThreadingHTTPServer((HOST, PORT), NexusHandler)
-    print(f"Nexus-Core server running at http://{HOST}:{PORT}")
-    
-    # Initial CLI check to trigger the LLM immediately if it runs the script in terminal
+    # Initial CLI check: stop immediately on first integrity error.
     ready, msg = get_integrity_status()
     if not ready:
         print(f"\n[BOOTSTRAP ERROR] {msg}\n")
-    
+        sys.exit(1)
+
+    server = ThreadingHTTPServer((HOST, PORT), NexusHandler)
+    print(f"Nexus-Core server running at http://{HOST}:{PORT}")
     server.serve_forever()
