@@ -53,7 +53,11 @@ def get_integrity_status():
     except Exception:
         return False, "IntegrityCheckError: Could not read installation_steps.txt."
 
-    # STEP 3: Validate the error file contains at least 5 arguments/items
+    # STEP 2.5: Patch file must exist before STEP 3 parsing/validation
+    if not ERROR_FILE.exists():
+        return False, "IntegrityCheckError: Missing Patch file for Capability Safety Justification (CSJ)"
+
+    # STEP 3:
     try:
         with ERROR_FILE.open("r", encoding="utf-8") as file:
             error_payload = json.load(file)

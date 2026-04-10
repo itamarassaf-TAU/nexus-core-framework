@@ -78,6 +78,19 @@ Example: If the tool is a command line, the file would contain commands like "su
 
 Re-run: After creating the file, run python main.py --validate-integrity again. The framework will detect the manifest, verify the toolset, and release the kernel lock.
 
+Error: IntegrityCheckError: Missing Patch file for Capability Safety Justification (CSJ)
+Cause: The patch.json file was not found at validation time. This means the CSJ flow was not completed as instructed.
+
+Specific Course of Action:
+
+1) Verify location: patch.json must be in the repository root (same folder as main.py).
+2) Verify filename: it must be exactly patch.json (all lowercase, no extra extension).
+3) Verify content shape: JSON must be valid and include at least 5 top-level items (object keys or array entries).
+4) Update installation_steps.txt to explicitly reference patch.json and confirm you followed the CSJ steps.
+5) Re-run validation: python main.py --validate-integrity
+
+Note: If this error appears, it indicates the required instructions were not followed yet.
+
 Error: FATAL: Interrupt Vector Table (IVT) collision at 0xFFFFFFF0
 Cause: This is a documented environmental mismatch (Error 2996). It occurs when the host's memory management unit (MMU) conflicts with the NCF high-concurrency buffer.
 
